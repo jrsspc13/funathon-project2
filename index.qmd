@@ -22,7 +22,6 @@ editor_options:
   chunk_output_type: console
 ---
 
-
 ```{=html}
 <table>
   <thead>
@@ -56,7 +55,7 @@ We explore two approaches to the same task. Both take a textual activity label a
 
 # Two independent parts
 
-::: {.callout-important}
+::: callout-important
 The two parts below are independent. You can tackle either one, or both, in any order, depending on your time and interests. Each part is self-contained and starts from the same initialization (see below).
 :::
 
@@ -95,7 +94,7 @@ Go to the [SSPCloud catalogue](https://datalab.sspcloud.fr/catalog) and launch a
 
 Open a terminal in the VS Code service and clone **your fork** (replace `<YOUR_GITHUB_NAME>` with your GitHub username, `<YOUR_GITHUB_TOKEN>` with your token, and so on):
 
-```bash
+``` bash
 git clone https://<YOUR_GITHUB_TOKEN>@github.com/<YOUR_GITHUB_NAME>/funathon-project2.git
 git config --global user.email "<YOUR_EMAIL>"
 git config --global user.name "<YOUR_GITHUB_NAME>"
@@ -106,7 +105,7 @@ cd funathon-project2
 
 The project uses [uv](https://docs.astral.sh/uv/) for dependency management. From the repository root, run:
 
-```bash
+``` bash
 uv sync
 ```
 
@@ -121,13 +120,15 @@ Re-run `uv sync` any time `pyproject.toml` or `uv.lock` change (for instance, af
 
 If you want to run code **interactively** in VS Code, instead of going through `quarto preview`, point VS Code to the virtual environment you just created:
 
-1. Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`).
-2. Run `>Python: Select Interpreter`.
-3. Choose **Enter interpreter path** and provide:
+1.  Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`).
 
-   ```
-   /home/onyxia/work/funathon-project2/.venv/bin/python
-   ```
+2.  Run `>Python: Select Interpreter`.
+
+3.  Choose **Enter interpreter path** and provide:
+
+    ```         
+    /home/onyxia/work/funathon-project2/.venv/bin/python
+    ```
 
 ## Run code interactively (optional but recommended)
 
@@ -135,7 +136,7 @@ For exploration, debugging, or quick experiments, the easiest workflow is to cre
 
 Example (`scratch.py` at the root of the repo):
 
-```python
+``` python
 # %%
 # If you need to change working directory (default is your interactive .py file location)
 # import os
