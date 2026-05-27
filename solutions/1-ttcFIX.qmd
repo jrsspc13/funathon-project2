@@ -1,0 +1,139 @@
+---
+title: "TTC – NACE Classification"
+format: html
+---
+
+# 📘 Overview
+
+This notebook shows how to build a **Text-to-Code (TTC)** system:
+
+- Input: free text descriptions
+- Output: NACE codes (311 classes)
+
+We will:
+1. Load data
+2. Split into train / validation / test
+3. Train tokenizer
+4. Train a classification model
+5. Evaluate performance
+
+---
+
+# 📊 Load data
+
+```{python}
+import polars as pl
+
+df = pl.read_parquet(
+    "https://minio.lab.sspcloud.fr/projet-formation/diffusion/funathon/2026/project2/generation_None_temp08.parquet"
+).to_pandas()
+
+print(df.head())
+print("Rows:", len(df))
+``
+//
+
+
+onyxia@vscode-python-937401-0:~/work/funathon-project2$ uv run solutions/1-ttcFIX.py 
+    code                                               name                               label
+0  01.11  Growing of cereals, other than rice, leguminou...       Pulses cultivation for market
+1  01.11  Growing of cereals, other than rice, leguminou...   Legume crop production activities
+2  01.11  Growing of cereals, other than rice, leguminou...       Broad bean farming operations
+3  01.11  Growing of cereals, other than rice, leguminou...  Chickpea harvesting and processing
+4  01.11  Growing of cereals, other than rice, leguminou...  Production of dried beans and peas
+Total rows: 70000
+Number of classes: 311
+Train: 49000 | Val: 10500 | Test: 10500
+[00:00:00] Pre-processing sequences       ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 0        /        0
+[00:00:00] Tokenize words                 ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 5346     /     5346
+[00:00:00] Count pairs                    ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 5346     /     5346
+[00:00:00] Compute merges                 ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 4921     /     4921
+Traceback (most recent call last):
+  File "/home/onyxia/work/funathon-project2/solutions/1-ttcFIX.py", line 81, in <module>
+    tokenizer.vocab_size = tokenizer.get_vocab_size()
+                           ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'WordPieceTokenizer' object has no attribute 'get_vocab_size'. Did you mean: 'vocab_size'?
+onyxia@vscode-python-937401-0:~/work/funathon-project2$ uv run solutions/1-ttcFIX.py 
+    code                                               name                               label
+0  01.11  Growing of cereals, other than rice, leguminou...       Pulses cultivation for market
+1  01.11  Growing of cereals, other than rice, leguminou...   Legume crop production activities
+2  01.11  Growing of cereals, other than rice, leguminou...       Broad bean farming operations
+3  01.11  Growing of cereals, other than rice, leguminou...  Chickpea harvesting and processing
+4  01.11  Growing of cereals, other than rice, leguminou...  Production of dried beans and peas
+Total rows: 70000
+Number of classes: 311
+Train: 49000 | Val: 10500 | Test: 10500
+[00:00:00] Pre-processing sequences       ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 0        /        0
+[00:00:00] Tokenize words                 ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 5346     /     5346
+[00:00:00] Count pairs                    ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 5346     /     5346
+[00:00:00] Compute merges                 ██████████████████████████████████████████████████████████████████████████████████████████████████████████████ 4921     /     4921
+Output tensor size: torch.Size([1, 10])
+2026-05-27 14:21:50 - torchTextClassifiers.torchTextClassifiers - Overriding model_config num_classes and/or categorical_vocabulary_sizes with values from value_encoder.
+2026-05-27 14:21:50 - torchTextClassifiers.model.model - 🔹 No categorical variable network provided; using only text embeddings.
+2026-05-27 14:21:51 - torchTextClassifiers.torchTextClassifiers - Starting training process...
+2026-05-27 14:21:51 - torchTextClassifiers.torchTextClassifiers - Running on: cpu
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+/home/onyxia/work/funathon-project2/.venv/lib/python3.13/site-packages/pytorch_lightning/trainer/connectors/logger_connector/logger_connector.py:76: Starting from v1.9.0, `tensorboardX` has been removed as a dependency of the `pytorch_lightning` package, due to potential conflicts with other packages in the ML ecosystem. For this reason, `logger=True` will use `CSVLogger` as the default logger, unless the `tensorboard` or `tensorboardX` packages are found. Please `pip install lightning[extra]` or one of them to enable TensorBoard support by default
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+2026-05-27 14:21:51 - torchTextClassifiers.torchTextClassifiers - Launching training...
+┏━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━┳━━━━━━━┓
+┃   ┃ Name        ┃ Type                    ┃ Params ┃ Mode  ┃ FLOPs ┃
+┡━━━╇━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━╇━━━━━━━┩
+│ 0 │ model       │ TextClassificationModel │  510 K │ train │     0 │
+│ 1 │ loss        │ CrossEntropyLoss        │      0 │ train │     0 │
+│ 2 │ accuracy_fn │ MulticlassAccuracy      │      0 │ train │     0 │
+└───┴─────────────┴─────────────────────────┴────────┴───────┴───────┘
+Trainable params: 510 K                                                                                                                                                     
+Non-trainable params: 0                                                                                                                                                     
+Total params: 510 K                                                                                                                                                         
+Total estimated model params size (MB): 2                                                                                                                                   
+Modules in train mode: 8                                                                                                                                                    
+Modules in eval mode: 0                                                                                                                                                     
+Total FLOPs: 0                                                                                                                                                              
+/home/onyxia/work/funathon-project2/.venv/lib/python3.13/site-packages/pytorch_lightning/utilities/data.py:79: Trying to infer the `batch_size` from an ambiguous 
+collection. The batch size we found is 128. To avoid any miscalculations, use `self.log(..., batch_size=batch_size)`.
+/home/onyxia/work/funathon-project2/.venv/lib/python3.13/site-packages/pytorch_lightning/utilities/data.py:79: Trying to infer the `batch_size` from an ambiguous 
+collection. The batch size we found is 104. To avoid any miscalculations, use `self.log(..., batch_size=batch_size)`.
+/home/onyxia/work/funathon-project2/.venv/lib/python3.13/site-packages/pytorch_lightning/utilities/data.py:79: Trying to infer the `batch_size` from an ambiguous 
+collection. The batch size we found is 4. To avoid any miscalculations, use `self.log(..., batch_size=batch_size)`.
+Epoch 0/0  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 383/383 0:01:24 • 0:00:00 5.02it/s v_num: 2.000 train_loss_step: 2.964 val_loss: 2.939 val_accuracy: 0.416              
+                                                                                       train_loss_epoch: 3.823 train_accuracy: 0.282                                        
+Epoch 0/0  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 383/383 0:01:24 • 0:00:00 5.02it/s v_num: 2.000 train_loss_step: 2.964 val_loss: 2.939 val_accuracy: 0.416              
+                                                                                       train_loss_epoch: 3.823 train_accuracy: 0.282                                        
+2026/05/27 14:23:30 WARNING mlflow.pytorch: Saving pytorch model by Pickle or CloudPickle format requires exercising caution because these formats rely on Python's object serialization mechanism, which can execute arbitrary code during deserialization. The recommended safe alternative is to set `serialization_format` to 'pt2' to save the PyTorch model using the safe graph model format.
+2026/05/27 14:23:30 WARNING mlflow.utils.requirements_utils: Found torch version (2.6.0+cpu) contains a local version label (+cpu). MLflow logged a pip requirement for this package as 'torch==2.6.0' without the local version label to make it installable from PyPI. To specify pip requirements containing local version labels, please use `conda_env` or `pip_requirements`.
+2026/05/27 14:23:30 INFO mlflow.utils.uv_utils: Detected uv project: found uv.lock and pyproject.toml in /home/onyxia/work/funathon-project2
+2026/05/27 14:23:30 INFO mlflow.utils.environment: Detected uv project at /home/onyxia/work/funathon-project2. Attempting to export requirements via 'uv export'.
+2026/05/27 14:23:30 INFO mlflow.utils.uv_utils: Exported 186 dependencies via uv
+2026/05/27 14:23:30 INFO mlflow.utils.environment: Successfully exported 186 requirements from uv project. Skipping package capture based inference.
+2026/05/27 14:23:30 INFO mlflow.utils.uv_utils: Extracted 1 private index URL(s) from uv.lock
+2026/05/27 14:23:30 WARNING mlflow.utils.uv_utils: Private package indexes detected in uv lockfile. Ensure credentials are available at model load time via UV_INDEX_* environment variables or .netrc file.
+2026/05/27 14:23:30 WARNING mlflow.utils.environment: Failed to resolve installed pip version. ``pip`` will be added to conda.yaml environment spec without a version specifier.
+2026-05-27 14:23:33 - torchTextClassifiers.torchTextClassifiers - Training completed in 102.37 seconds.
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+💡 Tip: For seamless cloud logging and experiment tracking, try installing [litlogger](https://pypi.org/project/litlogger/) to enable LitLogger, which logs metrics and artifacts automatically to the Lightning Experiments platform.
+`weights_only` was not set, defaulting to `False`.
+2026-05-27 14:23:33 - torchTextClassifiers.torchTextClassifiers - Model saved successfully to my_ttc
+🏃 View run vaunted-hound-443 at: https://user-jrsspc13-mlflow.user.lab.sspcloud.fr/#/experiments/1/runs/efc3adfc60154c04bfd08d348ba569c2
+🧪 View experiment at: https://user-jrsspc13-mlflow.user.lab.sspcloud.fr/#/experiments/1
+Downloading artifacts: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 4/4 [00:00<00:00,  8.01it/s]
+2026-05-27 14:23:37 - torchTextClassifiers.torchTextClassifiers - Overriding model_config num_classes and/or categorical_vocabulary_sizes with values from value_encoder.
+2026-05-27 14:23:37 - torchTextClassifiers.model.model - 🔹 No categorical variable network provided; using only text embeddings.
+2026-05-27 14:23:37 - torchTextClassifiers.torchTextClassifiers - Model checkpoint loaded from /tmp/tmpdsteemrc/model_artifacts/model_checkpoint.ckpt
+2026-05-27 14:23:37 - torchTextClassifiers.torchTextClassifiers - Model loaded successfully from /tmp/tmpdsteemrc/model_artifacts
+
+Text: Commercial property management
+True: 68.20
+Pred: ['68.20' '70.20' '70.10']
+
+Text: Cost management program implementation
+True: 70.20
+Pred: ['70.20' '68.20' '62.20']
+
+Text: Commercial goods road haulage services
+True: 49.41
+Pred: ['68.20' '49.41' '46.19']
+
+Test accuracy: 0.4149
